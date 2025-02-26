@@ -11,6 +11,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from '@/lib/utils';
 
@@ -44,6 +45,7 @@ export const CreatorsList: React.FC<CreatorsListProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
   
   const sortOptions = [
     { label: 'Rating', value: 'rating' },
@@ -51,6 +53,16 @@ export const CreatorsList: React.FC<CreatorsListProps> = ({
     { label: 'Price: High to Low', value: 'price_desc' },
     { label: 'Distance', value: 'distance' }
   ];
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    api.on("select", () => {
+      setCurrentSlide(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   // Function to render the dot indicators
   const renderDotIndicators = () => {
@@ -93,10 +105,7 @@ export const CreatorsList: React.FC<CreatorsListProps> = ({
               containScroll: false,
             }}
             className="w-full"
-            onSelect={(api) => {
-              const selectedIndex = api.selectedScrollSnap();
-              setCurrentSlide(selectedIndex);
-            }}
+            setApi={setApi}
           >
             <CarouselContent className="-ml-4">
               {creators.map((creator, index) => (
